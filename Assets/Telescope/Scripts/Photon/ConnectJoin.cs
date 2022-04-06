@@ -89,7 +89,7 @@ public class ConnectJoin : MonoBehaviourPunCallbacks
         Debug.Log( "OnJoinRandomFailed() was called by PUN. No random room available in region [" + PhotonNetwork.CloudRegion + "], so we create one. Calling: PhotonNetwork.CreateRoom(null, new RoomOptions() {maxPlayers = 4}, null);" );
 
         RoomOptions roomOptions = new RoomOptions() { MaxPlayers = this.MaxPlayers };
-        roomOptions.CustomRoomProperties = GetRoomProperties();
+        roomOptions.CustomRoomProperties = GetRoomProperties( true );
         roomOptions.CustomRoomPropertiesForLobby = new string[]
         {
             "Level",
@@ -112,11 +112,12 @@ public class ConnectJoin : MonoBehaviourPunCallbacks
         FindObjectOfType<PhotonPlayerCreator>().OnJoinedRoom();
     }
 
-    public ExitGames.Client.Photon.Hashtable GetRoomProperties()
+    public ExitGames.Client.Photon.Hashtable GetRoomProperties( bool create = false )
 	{
         var hash = new ExitGames.Client.Photon.Hashtable();
 		{
-            hash.Add( "Level", "Same" );
+            Debug.Log( "Properties for " + create + " and " + ( FindObjectOfType<Admin>() != null ) + " = " + ( FindObjectOfType<Admin>() != null == create ) );
+            hash.Add( "Level", FindObjectOfType<Admin>() != null == create );
 		}
         return hash;
 	}

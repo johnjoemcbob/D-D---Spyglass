@@ -10,7 +10,6 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 
 	private Vector3 realPosition = Vector3.zero;
 	private Quaternion realRotation = Quaternion.identity;
-	private int realPoint = 0;
 
 	void Update()
 	{
@@ -18,10 +17,13 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 		if ( admin != null )
 		{
 			// Sync other player on admin
-			Camera.main.transform.position = realPosition;
-			Camera.main.transform.rotation = Quaternion.Lerp( Camera.main.transform.rotation, realRotation, LerpSpeed );
-			admin.IndexText.text = "Current index: " + realPoint.ToString();
-			admin.RotationText.text = "Rotation: " + Camera.main.transform.eulerAngles.ToString();
+			Camera cam = Compass.Instance.Camera;
+			cam.transform.rotation = Quaternion.Lerp( cam.transform.rotation, realRotation, LerpSpeed );
+			admin.RotationText.text = "Rotation: " + cam.transform.eulerAngles.ToString();
+		}
+		else
+		{
+			BoatMover.Instance.transform.position = realPosition;
 		}
 	}
 
@@ -30,23 +32,30 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 		var admin = FindObjectOfType<Admin>();
 		if ( stream.IsWriting )
 		{
-			// Only send when parented to a mech
+			// Client controls rotation, admin position
 			if ( admin == null )
 			{
 				// Basic Info
-				stream.SendNext( Camera.main.transform.position );
-				stream.SendNext( Camera.main.transform.rotation );
-				stream.SendNext( FindObjectOfType<BoatMover>().CurrentPoint );
+				Camera cam = Compass.Instance.Camera;
+				stream.SendNext( cam.transform.rotation );
+			}
+			else
+			{
+				// Basic Info
+				stream.SendNext( BoatMover.Instance.transform.position );
 			}
 		}
 		else
 		{
+			// Client controls rotation, admin position
 			if ( admin != null )
 			{
 				// Basic Info
-				realPosition = (Vector3) stream.ReceiveNext();
 				realRotation = (Quaternion) stream.ReceiveNext();
-				realPoint = (int) stream.ReceiveNext();
+			}
+			else
+			{
+				realPosition = (Vector3) stream.ReceiveNext();
 			}
 		}
 	}
@@ -55,13 +64,13 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 	[PunRPC]
 	void SendAdvanceBoat()
 	{
-		FindObjectOfType<BoatMover>().MoveBoatToNext();
+		BoatMover.Instance.MoveBoatToNext();
 	}
 
 	[PunRPC]
 	void SendResetBoat()
 	{
-		FindObjectOfType<BoatMover>().MoveBoatToIndex( 0 );
+		BoatMover.Instance.MoveBoatToIndex( 0 );
 	}
 
 	[PunRPC]

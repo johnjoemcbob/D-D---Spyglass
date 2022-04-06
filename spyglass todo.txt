@@ -1,0 +1,34 @@
+locations + timeline
+
+different heights for mountains
+different view distances for forest/mountain
+
+
+
+
+
+
+tilt to zoom in/out?
+
+
+record video
+
+
+
+
+
+done
+hex g3 b10 etc labels
+new admin view with player view cam in corner
+fix networking
+test networking with phone
+horizon effect?
+material auto replacements
+fix ui horizon effect
+fix hex labels
+test horizon on phone
+turn hex labels towards player view
+hex borders
+new movement with paired app - click to move boat instead
+ADD KOIR IN TO APP!!!
+show line of travel!!!!!!!!!!!!!!

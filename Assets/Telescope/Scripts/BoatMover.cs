@@ -4,9 +4,16 @@ using UnityEngine;
 
 public class BoatMover : MonoBehaviour
 {
-    public Transform[] PathPoints;
+	public static BoatMover Instance;
+
+	public Transform[] PathPoints;
 
 	public int CurrentPoint = 0;
+
+	private void Awake()
+	{
+		Instance = this;
+	}
 
 	private void Update()
 	{
