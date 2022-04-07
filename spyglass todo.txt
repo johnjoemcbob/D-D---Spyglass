@@ -1,18 +1,20 @@
-locations + timeline
-
 different heights for mountains
 different view distances for forest/mountain
 
+change client view to circle on admin ui
 
 
 
 
+locations + timeline
+dates
 
-tilt to zoom in/out?
+
+
+
 
 
 record video
-
 
 
 
@@ -32,3 +34,12 @@ hex borders
 new movement with paired app - click to move boat instead
 ADD KOIR IN TO APP!!!
 show line of travel!!!!!!!!!!!!!!
+try to use up/down from attitude and others from normal rotation?
+tilt to zoom in/out?
+lerp zoom
+network zoom
+fix wonky rotations
+lerp camera angles on admin
+admin spyglass doesn't rotate the correct way? slower?
+waterfall at lamthalal
+fix z fighting

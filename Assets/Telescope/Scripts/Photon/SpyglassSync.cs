@@ -10,20 +10,25 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 
 	private Vector3 realPosition = Vector3.zero;
 	private Quaternion realRotation = Quaternion.identity;
+	private float realZoom = 1;
 
 	void Update()
 	{
-		var admin = FindObjectOfType<Admin>();
-		if ( admin != null )
+		if ( !photonView.IsMine )
 		{
-			// Sync other player on admin
-			Camera cam = Compass.Instance.Camera;
-			cam.transform.rotation = Quaternion.Lerp( cam.transform.rotation, realRotation, LerpSpeed );
-			admin.RotationText.text = "Rotation: " + cam.transform.eulerAngles.ToString();
-		}
-		else
-		{
-			BoatMover.Instance.transform.position = realPosition;
+			var admin = FindObjectOfType<Admin>();
+			if ( admin != null )
+			{
+				// Sync other player on admin
+				Camera cam = Compass.Instance.Camera;
+				cam.transform.parent.rotation = Quaternion.Lerp( cam.transform.parent.rotation, realRotation, LerpSpeed );
+				Spyglass.Instance.Zoom = realZoom;
+				admin.RotationText.text = "Rotation: " + cam.transform.parent.eulerAngles.ToString();
+			}
+			else
+			{
+				BoatMover.Instance.transform.position = realPosition;
+			}
 		}
 	}
 
@@ -37,7 +42,8 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 			{
 				// Basic Info
 				Camera cam = Compass.Instance.Camera;
-				stream.SendNext( cam.transform.rotation );
+				stream.SendNext( cam.transform.parent.rotation );
+				stream.SendNext( Spyglass.Instance.Zoom );
 			}
 			else
 			{
@@ -52,6 +58,7 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 			{
 				// Basic Info
 				realRotation = (Quaternion) stream.ReceiveNext();
+				realZoom = (float) stream.ReceiveNext();
 			}
 			else
 			{

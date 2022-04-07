@@ -78,7 +78,10 @@ public class MapData : MonoBehaviour
                     obj.transform.localEulerAngles = new Vector3( 0, -30, 0 );
                     obj.transform.localScale = Vector3.one;
 
-                    obj.GetComponentInChildren<TextMeshProUGUI>().text = label_letter + label_number.ToString();
+					foreach ( var text in obj.GetComponentsInChildren<TextMeshProUGUI>() )
+					{
+                        text.text = label_letter + label_number.ToString();
+                    }
 
                     label_number++;
                     position.z += HexSize.y;
