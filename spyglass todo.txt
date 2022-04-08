@@ -11,9 +11,6 @@ dates
 
 
 
-
-
-
 record video
 
 
@@ -43,3 +40,8 @@ lerp camera angles on admin
 admin spyglass doesn't rotate the correct way? slower?
 waterfall at lamthalal
 fix z fighting
+pirn is woodlands
+kalerol tower
+stop seeing through objects!
+especially under the map - k tower lol
+ui to control k tower and sync it to phone too

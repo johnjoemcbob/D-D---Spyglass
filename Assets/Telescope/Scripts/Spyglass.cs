@@ -10,6 +10,7 @@ public class Spyglass : MonoBehaviour
     public float ZoomSpeed = 2.5f;
     public float ZoomDeadzone = 0.5f;
     public float MaxZoom = 2;
+    public float PushbackMult = 0.8f;
     public bool Newer = false;
 
     public Transform Gyro;
@@ -83,6 +84,15 @@ public class Spyglass : MonoBehaviour
         LastRoll = roll;
         var child = transform.GetChild( 0 );
         child.localPosition = Vector3.Lerp( child.localPosition, Vector3.forward * Zoom, Time.deltaTime * ZoomSpeed );
+
+        // Camera raycast collision pushback
+        Ray ray = new Ray( Compass.Instance.Camera.transform.parent.position, Compass.Instance.Camera.transform.forward );
+        RaycastHit hit;
+        LayerMask layer = 1 << LayerMask.NameToLayer( "Default" );
+        if ( Physics.Raycast( ray, out hit, Zoom, layer ) )
+		{
+            child.localPosition = Vector3.forward * hit.distance * PushbackMult;
+		}
     }
 
     void GyroModifyCamera()
