@@ -11,6 +11,8 @@ using UnityEditor;
 [ExecuteInEditMode]
 public class MapData : MonoBehaviour
 {
+    public static MapData Instance;
+
     [Serializable]
     public enum Hex
 	{
@@ -28,6 +30,7 @@ public class MapData : MonoBehaviour
 	{
         public int YOffset;
         public Hex[] Rows;
+        public GameObject[] Instances;
 	}
 
     [Header( "Variables" )]
@@ -39,8 +42,13 @@ public class MapData : MonoBehaviour
     [Header( "Assets" )]
     public GameObject[] HexPrefabs;
 
+	private void Awake()
+	{
+        Instance = this;
+	}
+
 #if UNITY_EDITOR
-    void Start()
+	void Start()
     {
         
     }
@@ -65,23 +73,29 @@ public class MapData : MonoBehaviour
             int count = 0;
             char label_letter = 'A';
             int label_number = 0;
-			foreach ( var hexcol in Hexes )
+			for ( int col = 0; col < Hexes.Length; col++ )
 			{
+                HexColumn hexcol = Hexes[col];
                 position.z = hexcol.YOffset + ( count % 2 == 0 ? 0 : 0.5f );
                 label_number = LabelStartOffset + hexcol.YOffset;
 
-                foreach ( var hex in hexcol.Rows )
+                Hexes[col].Instances = new GameObject[hexcol.Rows.Length];
+				for ( int row = 0; row < hexcol.Rows.Length; row++ )
 				{
+                    Hex hex = hexcol.Rows[row];
                     GameObject obj = PrefabUtility.InstantiatePrefab( HexPrefabs[(int) hex] ) as GameObject;
-                    obj.transform.SetParent( transform.GetChild( 0 ) );
-                    obj.transform.localPosition = position;
-                    obj.transform.localEulerAngles = new Vector3( 0, -30, 0 );
-                    obj.transform.localScale = Vector3.one;
+                    {
+                        obj.transform.SetParent( transform.GetChild( 0 ) );
+                        obj.transform.localPosition = position;
+                        obj.transform.localEulerAngles = new Vector3( 0, -30, 0 );
+                        obj.transform.localScale = Vector3.one;
 
-					foreach ( var text in obj.GetComponentsInChildren<TextMeshProUGUI>() )
-					{
-                        text.text = label_letter + label_number.ToString();
+                        foreach ( var text in obj.GetComponentsInChildren<TextMeshProUGUI>() )
+                        {
+                            text.text = label_letter + label_number.ToString();
+                        }
                     }
+                    Hexes[col].Instances[row] = obj;
 
                     label_number++;
                     position.z += HexSize.y;
@@ -96,4 +110,12 @@ public class MapData : MonoBehaviour
         }
     }
 #endif
+
+    public Vector3 GetHexWorldPos( Vector2 hex )
+	{
+        var hexcol = Hexes[(int) hex.x];
+        float off = hex.y - 4 - hexcol.YOffset; // wtf
+        var obj = hexcol.Instances[(int) off];
+        return obj.transform.position;
+    }
 }
