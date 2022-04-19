@@ -136,34 +136,25 @@ public class Timeline : MonoBehaviour
         GameObject obj = Instantiate( LinePrefab, transform );
         obj.name = character;
 
-        List<Vector3> positions = new List<Vector3>();
-        // For all unique dates,
-        Vector3 lastpos = MapData.Instance.GetHexWorldPos( events[0].Hex );
-		foreach ( var date in UniqueDates )
-        {
-            // Count max number of occurances of this date through all timelines
-            int occurances = 0;
-			foreach ( var timeline in CharacterTimelines )
-			{
-                int currentoccur = 0;
-				foreach ( var frame in timeline.Value )
-				{
-                    if ( frame.PrettyDate == date )
-					{
-                        currentoccur++;
-					}
-				}
-                if ( currentoccur > occurances )
-				{
-                    occurances = currentoccur;
-				}
-			}
+        var line = obj.GetComponentInChildren<LineRenderer>();
+        TimelineLines.Add( character, line );
+    }
 
-            // Check if there is an entry for this date in the actual data
-            // If there are entries then add them all now
-            foreach ( var frame in events )
+    void UpdateTimelineLine( string character, List<CharacterEventKeyframe> events )
+	{
+        List<Vector3> positions = new List<Vector3>();
+
+        // Get the current date
+        Vector3 lastpos = MapData.Instance.GetHexWorldPos( events[0].Hex );
+        string startdate = CurrentDateText.text;
+        int range = 5;
+		for ( int offset = -range; offset <= 0; offset++ )
+		{
+            bool occurred = false;
             {
-                if ( frame.PrettyDate == date )
+                string date = DateTime.Parse( startdate ).AddDays( offset ).ToString( "dd/MM/yyyy" );
+                // Check if there is an entry for this date in the actual data
+                foreach ( var frame in events )
                 {
                     // Find the hex by the x,y
                     var hex = frame.Hex;
@@ -172,15 +163,21 @@ public class Timeline : MonoBehaviour
                     // Offset in hex by character index for running ease of view
                     pos += new Vector3( 1, 0, 1 ) * Characters.IndexOf( character ) * CharacterLineOffset;
 
-                    // Add that point to the line
-                    positions.Add( pos );
-                    lastpos = pos;
+                    if ( frame.PrettyDate == date )
+                    {
+                        // Add that point to the line
+                        positions.Add( pos );
+                        lastpos = pos;
 
-                    occurances--;
+                        occurred = true;
+                    }
+                    else if ( DateTime.Parse( frame.PrettyDate ) < DateTime.Parse( date ) )
+					{
+                        lastpos = pos;
+					}
                 }
             }
-            // Any remaining missing occurances, just add a duplicate (need all line renderers to have the same count)
-		    for ( int i = 0; i < occurances; i++ )
+            if ( !occurred )
             {
                 // If not, duplicate the previous point
                 var pos = lastpos;
@@ -188,7 +185,9 @@ public class Timeline : MonoBehaviour
                 positions.Add( pos );
             }
         }
-        var line = obj.GetComponentInChildren<LineRenderer>();
+
+        // Update the line now
+        var line = TimelineLines[character];
         {
             line.positionCount = positions.Count;
             line.SetPositions( positions.ToArray() );
@@ -196,7 +195,6 @@ public class Timeline : MonoBehaviour
             line.startColor = Colours[Characters.IndexOf( character )];
             line.endColor = Colours[Characters.IndexOf( character )];
         }
-        TimelineLines.Add( character, line );
     }
 	#endregion
 
@@ -229,7 +227,7 @@ public class Timeline : MonoBehaviour
 
             // For each line renderer, use that point index to generate new width curve
             var line = TimelineLines[timeline.Key];
-            float time = (float) index / line.positionCount;
+            float time = 0.5f;// (float) index / line.positionCount;
             Keyframe[] keys = new Keyframe[2];
 			{
                 keys[0] = new Keyframe( 0, 0.5f );
@@ -245,9 +243,11 @@ public class Timeline : MonoBehaviour
             Gradient gradient = new Gradient();
             gradient.SetKeys(
                 new GradientColorKey[] { new GradientColorKey( col, 0.0f ) },
-                new GradientAlphaKey[] { new GradientAlphaKey( 0.5f, 0.0f ), new GradientAlphaKey( 1, time ), new GradientAlphaKey( 0.5f, time + 0.01f ), new GradientAlphaKey( 0, 1 ) }
+                new GradientAlphaKey[] { new GradientAlphaKey( 0.5f, 0 ), new GradientAlphaKey( 0.5f, 0.01f ), new GradientAlphaKey( 1, time ) }//, new GradientAlphaKey( 0.2f, time + 0.01f ), new GradientAlphaKey( 0.1f, 0.99f ), new GradientAlphaKey( 0.1f, 1 ) }
             );
             line.colorGradient = gradient;
+
+            UpdateTimelineLine( timeline.Key, timeline.Value );
         }
     }
     #endregion

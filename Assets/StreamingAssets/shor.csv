@@ -1,7 +1,7 @@
 date,hex,name,teleport?
 13/05/1111,H18,Born,0
 22/04/1447,H18,Set out,0
-26/04/1447,F16,Board Ban Sidhe,0
+26/04/1447,G16,Board Ban Sidhe,0
 30/04/1447,E15,Reach Koir,0
 02/05/1447,G13,Reach Bunree,0
 03/05/1447,C10,Reach Alt Muirac,0
@@ -9,12 +9,10 @@ date,hex,name,teleport?
 07/05/1447,I8,Reach Callaird,0
 09/05/1447,O4,Reach Skea,0
 13/05/1447,L3,PLAY STARTS,0
-14/05/1447,H3,Reach Dun Eilean,0
-14/05/1447,H2,Dun Eilean,0
+14/05/1447,H2,Reach Dun Eilean,0
 15/05/1447,F1,Outside The Tomb of the Ordained Ascender,0
 16/05/1447,H2,Back to Dun Eilean,0
 17/05/1447,F1,Enter The Tomb,0
-17/05/1447,H2,Back to Dun Eilean,0
 18/05/1447,I2,Seek The Urchin,0
 19/05/1447,I2,Censor Attacks,0
 20/05/1447,I1,Find The Urchin,0
@@ -26,18 +24,21 @@ date,hex,name,teleport?
 26/05/1447,H2,Extended Rest,0
 01/06/1447,H2,Dun Eilean Attacked!,0
 02/06/1447,G2,Goblin Camp,0
-02/06/1447,H2,Dun Eilean,0
 03/06/1447,H3,Ban Sidhe,0
+04/06/1447,G4,Ban Sidhe,0
+05/06/1447,G5,Ban Sidhe,0
+06/06/1447,F5,Ban Sidhe,0
+07/06/1447,E6,Ban Sidhe,0
+08/06/1447,D6,Ban Sidhe,0
+09/06/1447,D7,Ban Sidhe,0
+10/06/1447,D8,Ban Sidhe,0
+11/06/1447,C9,Ban Sidhe,0
 12/06/1447,C10,Reach Alt Muirac,0
 13/06/1447,B10,Alt Muirac,0
-14/06/1447,C10,Travel To Koir,0
 14/06/1447,D10,Travel To Koir,0
-15/06/1447,D11,Travel To Koir,0
 15/06/1447,E12,Travel To Koir,0
-16/06/1447,F12,Travel To Koir,0
 16/06/1447,F13,Travel To Koir,0
 17/06/1447,E14,Travel To Koir,0
-18/06/1447,E15,Reach Koir,0
 18/06/1447,D15,Reach Koir,0
 19/06/1447,D16,Journey to The Workshop of JoY,0
 20/06/1447,E17,???,0
