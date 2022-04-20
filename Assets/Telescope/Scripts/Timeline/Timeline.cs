@@ -6,11 +6,20 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum KeyframePriority
+{
+    Normal,
+    Timeline,
+    Screen,
+    Shockwave
+}
+
 public struct CharacterEventKeyframe
 {
     public string EventName;
     public DateTime Date;
     public string PrettyDate;
+    public KeyframePriority Priority;
     public bool Teleport;
     public Vector2 Hex;
 }
@@ -24,18 +33,24 @@ public class Timeline : MonoBehaviour
     [Header( "Variables" )]
     public Color[] Colours;
     public float CharacterLineOffset = 5;
+    public float LerpSpeed = 5;
 
     [Header( "References" )]
     public Slider TimelineSlider;
     public Text CurrentDateText;
+    public Transform ScreenPriorityMessageParent;
 
     [Header( "Assets" )]
     public GameObject LinePrefab;
+    public GameObject SliderLabelPrefab;
+    public GameObject ScreenPriorityPrefab;
+    public GameObject ShockwavePriorityPrefab;
 
     // List of all character name instances in loaded
     public List<string> Characters = new List<string>();
     Dictionary<string, List<CharacterEventKeyframe>> CharacterTimelines = new Dictionary<string, List<CharacterEventKeyframe>>();
     Dictionary<string, LineRenderer> TimelineLines = new Dictionary<string, LineRenderer>();
+    Dictionary<string, Vector3[]> TimelineTargets = new Dictionary<string, Vector3[]>();
     List<string> UniqueDates = new List<string>();
 
     void Start()
@@ -47,7 +62,12 @@ public class Timeline : MonoBehaviour
 
     void Update()
     {
+        UpdateTimelineLines();
 
+        if ( Input.GetKeyDown( KeyCode.RightArrow ) )
+		{
+            TimelineSlider.value = TimelineSlider.value + 1;
+		}
     }
 
 	#region LoadCSV
@@ -106,7 +126,8 @@ public class Timeline : MonoBehaviour
                     frame.Hex = new Vector2( x, y );
 
                     frame.EventName = split[2];
-                    frame.Teleport = split[3] == "1";
+                    frame.Priority = (KeyframePriority) int.Parse( split[3] );
+                    frame.Teleport = split[4] == "1";
 				}
                 events.Add( frame );
                 last = frame;
@@ -138,9 +159,10 @@ public class Timeline : MonoBehaviour
 
         var line = obj.GetComponentInChildren<LineRenderer>();
         TimelineLines.Add( character, line );
+        TimelineTargets.Add( character, null );
     }
 
-    void UpdateTimelineLine( string character, List<CharacterEventKeyframe> events )
+    void ProcessTimelineLine( string character, List<CharacterEventKeyframe> events )
 	{
         List<Vector3> positions = new List<Vector3>();
 
@@ -160,9 +182,6 @@ public class Timeline : MonoBehaviour
                     var hex = frame.Hex;
                     var pos = MapData.Instance.GetHexWorldPos( hex );
 
-                    // Offset in hex by character index for running ease of view
-                    pos += new Vector3( 1, 0, 1 ) * Characters.IndexOf( character ) * CharacterLineOffset;
-
                     if ( frame.PrettyDate == date )
                     {
                         // Add that point to the line
@@ -181,19 +200,58 @@ public class Timeline : MonoBehaviour
             {
                 // If not, duplicate the previous point
                 var pos = lastpos;
-                pos += new Vector3( 1, 0, 1 ) * Characters.IndexOf( character ) * CharacterLineOffset;
                 positions.Add( pos );
             }
         }
 
         // Update the line now
         var line = TimelineLines[character];
+        if ( line.positionCount != positions.Count )
         {
+            // Initialise
             line.positionCount = positions.Count;
             line.SetPositions( positions.ToArray() );
-            line.material.color = Colours[Characters.IndexOf( character )];
-            line.startColor = Colours[Characters.IndexOf( character )];
-            line.endColor = Colours[Characters.IndexOf( character )];
+        }
+        TimelineTargets[character] = positions.ToArray();
+    }
+
+    void UpdateTimelineLines()
+	{
+		foreach ( var timeline in TimelineLines )
+		{
+            var line = timeline.Value;
+            var positions = TimelineTargets[timeline.Key];
+            line.positionCount = positions.Length;
+            Vector3[] poses = new Vector3[positions.Length];
+            {
+                line.GetPositions( poses );
+
+				for ( int p = 0; p < positions.Length; p++ )
+				{
+                    var pos = positions[p];
+
+                    // Offset in hex by character index for running ease of view
+                    var minus = Characters.Count / 2;
+                    // Offset direction is calculated by current direction of movement for always separating properly
+                    var dir = new Vector3( 1, 0, 1 );
+					{
+                        var forward = Vector3.forward;
+                        if ( p == 0 )
+                        {
+                            forward = ( positions[p + 1] - positions[p] ).normalized;
+                        }
+                        else
+						{
+                            forward = ( positions[p] - positions[0] ).normalized;
+						}
+                        dir = new Vector3( forward.z, 0, -forward.x );
+					}
+                    pos += dir * ( Characters.IndexOf( timeline.Key ) - minus ) * CharacterLineOffset;
+
+                    poses[p] = Vector3.Lerp( poses[p], pos, Time.deltaTime * LerpSpeed );
+				}
+            }
+            line.SetPositions( poses );
         }
     }
 	#endregion
@@ -216,15 +274,6 @@ public class Timeline : MonoBehaviour
 		// For each CSV, find that date's last index occurance
 		foreach ( var timeline in CharacterTimelines )
 		{
-            int index = 0;
-			foreach ( var frame in timeline.Value )
-            {
-                if ( frame.Date < currentdate )
-				{
-                    index++;
-				}
-			}
-
             // For each line renderer, use that point index to generate new width curve
             var line = TimelineLines[timeline.Key];
             float time = 0.5f;// (float) index / line.positionCount;
@@ -247,8 +296,100 @@ public class Timeline : MonoBehaviour
             );
             line.colorGradient = gradient;
 
-            UpdateTimelineLine( timeline.Key, timeline.Value );
+            ProcessTimelineLine( timeline.Key, timeline.Value );
+
+            int index = 0;
+            foreach ( var frame in timeline.Value )
+            {
+                if ( frame.Date <= currentdate )
+                {
+                    index++;
+                }
+            }
+            if ( index != 0 )
+			{
+                index--;
+			}
+            HandlePriority( timeline.Key, timeline.Value[index] );
         }
+    }
+	#endregion
+
+	#region Priorities
+    void HandlePriority( string character, CharacterEventKeyframe frame )
+	{
+		switch ( frame.Priority )
+		{
+			case KeyframePriority.Normal:
+				break;
+			case KeyframePriority.Timeline:
+                break;
+			case KeyframePriority.Screen:
+                HandlePriorityScreen( character, frame );
+                break;
+			case KeyframePriority.Shockwave:
+                HandlePriorityScreen( character, frame );
+                HandlePriorityShockwave( character, frame );
+                break;
+			default:
+				break;
+		}
+	}
+
+    void HandlePriorityScreen( string character, CharacterEventKeyframe frame )
+	{
+        // Spawn message as child of child 0
+        GameObject msg = Instantiate( ScreenPriorityPrefab, ScreenPriorityMessageParent );
+        msg.GetComponentInChildren<Text>().text = frame.EventName;
+        LayoutRebuilder.ForceRebuildLayoutImmediate( (RectTransform) ScreenPriorityMessageParent );
+        StartCoroutine( Co_HandlePriorityScreen( msg ) );
+	}
+
+    IEnumerator Co_HandlePriorityScreen( GameObject msg )
+	{
+        var txt = msg.GetComponentInChildren<Text>();
+        var img = msg.GetComponentInChildren<Image>();
+        var img_col_target = img.color.a;
+        var colour = txt.color;
+		{
+            colour.a = 0;
+		}
+        var img_col = img.color;
+		{
+            img_col.a = 0;
+		}
+        // Fade in
+        float max = 8;
+        for ( int i = 0; i <= max; i++ )
+        {
+            colour.a = i / max;
+            img_col.a = ( i / max ) * img_col_target;
+            txt.color = colour;
+            img.color = img_col;
+            yield return new WaitForEndOfFrame();
+        }
+
+        // Wait
+        yield return new WaitForSeconds( 2 );
+
+        // Fade out
+        for ( int i = 0; i <= max; i++ )
+        {
+            colour.a = 1 - ( i / max );
+            img_col.a = ( 1 - ( i / max ) ) * img_col_target;
+            txt.color = colour;
+            img.color = img_col;
+            yield return new WaitForEndOfFrame();
+        }
+        Destroy( msg );
+    }
+
+    void HandlePriorityShockwave( string character, CharacterEventKeyframe frame )
+	{
+        GameObject shock = Instantiate( ShockwavePriorityPrefab, transform );
+        shock.transform.position = MapData.Instance.GetHexWorldPos( frame.Hex );
+        shock.transform.position += Vector3.up * 5;
+        shock.GetComponent<SpriteRenderer>().color = Colours[Characters.IndexOf( character )];
     }
     #endregion
 }

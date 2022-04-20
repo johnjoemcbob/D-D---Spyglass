@@ -1,0 +1,27 @@
+date,hex,name,priority,teleport?
+03/05/1447,C10,Board Ban Sidhe,0,0
+06/05/1447,F6,Halfway Callaird,0,0
+07/05/1447,I8,Reach Callaird,0,0
+09/05/1447,O4,Reach Skea,0,0
+14/05/1447,H2,Reach Dun Eilean,0,0
+03/06/1447,H3,Ban Sidhe,0,0
+04/06/1447,G4,Ban Sidhe,0,0
+05/06/1447,G5,Ban Sidhe,0,0
+06/06/1447,F5,Ban Sidhe,0,0
+07/06/1447,E6,Ban Sidhe,0,0
+08/06/1447,D6,Ban Sidhe,0,0
+09/06/1447,D7,Ban Sidhe,0,0
+10/06/1447,D8,Ban Sidhe,0,0
+11/06/1447,C9,Ban Sidhe,0,0
+12/06/1447,C10,Reach Alt Muirac,0,0
++1,D10,Travel To Bunree,0,0
++1,E12,Travel To Bunree,0,0
++1,G13,Travel To Bunree,0,0
++1,H12,Bunree,0,0
++1,E15,Travel To Koir,0,0
++1,H15,Koir,0,0
++1,G16,Travel To Lamthalal,0,0
++2,H16,Travel To Low Temple,0,0
++2,H17,Travel To Low Temple,0,0
++2,H18,Travel To Low Temple,0,0
++1,H18,Low Temple,0,0

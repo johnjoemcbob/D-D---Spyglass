@@ -1,0 +1,50 @@
+dnd timeline
+
+
+teleport?
+
+
+ui
+character toggle list
+
+	
+timeline slider with priority dates shown
+
+option to have 2d ui key on map itself
+	using world to camera screen point
+	as close to head of line as possible, without overlapping others
+	name, colour, maybe pic
+
+
+sadie
+
+repeat option in csv - 5-repeat-10
+(repeat the previous 5 date offsets, 10 times)
+
+done
+basic csv
+load hex pos
+display hex poses
+timeline slider
+	slider
+	populate length by CSVs
+	change value to affect line width
+	update line colours when timeline slider changes
+
+	add date entries to other csvs programatically?
+	count max occurance of each date in all csvs
+	all linerenderers must then have that many
+add other characters
+fix timeline lines!!!!!!!!
+	linerenderer needs the same number of entries
+	change the number of points on slider change
+	always select the same dates per character
+	don't need to change the curves then
+	the middle point is just always the current location
+lerp timeline positions
+get forward of line direction and then right to separate better?????
+priorities
+	0 - normal
+	1 - show on timeline ui
+	2 - show text on screen
+	3 - shockwave out of location

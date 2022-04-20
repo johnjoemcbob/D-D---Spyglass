@@ -1,0 +1,56 @@
+date,hex,name,priority,teleport?
+13/04/1447,I8,Reach Callaird,0,0
+16/04/1447,O4,Reach Skea,0,0
+19/04/1447,H2,Reach Dun Eilean,0,0
+22/04/1447,C10,Reach Alt Muirac,0,0
+24/04/1447,G13,Reach Bunree,0,0
+25/04/1447,E15,Reach Koir,0,0
+26/04/1447,G16,Reach Lamthalal,0,0
+30/04/1447,E15,Reach Koir,0,0
+02/05/1447,G13,Reach Bunree,0,0
+03/05/1447,C10,Reach Alt Muirac,0,0
+06/05/1447,F6,Halfway Callaird,0,0
+07/05/1447,I8,Reach Callaird,0,0
+09/05/1447,O4,Reach Skea,0,0
+14/05/1447,H2,Reach Dun Eilean,0,0
+17/05/1447,C10,Reach Alt Muirac,0,0
+19/05/1447,G13,Reach Bunree,0,0
+20/05/1447,E15,Reach Koir,0,0
+21/05/1447,G16,Reach Lamthalal,0,0
+22/05/1447,E15,Reach Koir,0,0
+23/05/1447,G13,Reach Bunree,0,0
+25/05/1447,C10,Reach Alt Muirac,0,0
+27/05/1447,I8,Reach Callaird,0,0
+30/05/1447,O4,Reach Skea,0,0
+02/06/1447,H3,Reach Dun Eilean,0,0
+03/06/1447,H3,Ban Sidhe,0,0
+04/06/1447,G4,Ban Sidhe,0,0
+05/06/1447,G5,Ban Sidhe,0,0
+06/06/1447,F5,Ban Sidhe,0,0
+07/06/1447,E6,Ban Sidhe,0,0
+08/06/1447,D6,Ban Sidhe,0,0
+09/06/1447,D7,Ban Sidhe,0,0
+10/06/1447,D8,Ban Sidhe,0,0
+11/06/1447,C9,Ban Sidhe,0,0
+12/06/1447,C10,Reach Alt Muirac,0,0
+13/06/1447,B10,Alt Muirac,0,0
++2,G13,Reach Bunree,0,0
++1,G13,Bunree,0,0
++1,E15,Reach Koir,0,0
++1,E15,Koir,0,0
++1,G16,Reach Lamthalal,0,0
++1,G16,Lamthalal,0,0
++1,E15,Reach Koir,0,0
++1,E15,Koir,0,0
++1,G13,Reach Bunree,0,0
++1,G13,Bunree,0,0
++1,C10,Reach Alt Muirac,0,0
++1,C10,Alt Muirac,0,0
++2,I8,Reach Callaird,0,0
++1,I8,Callaird,0,0
++3,O4,Reach Skea,0,0
++1,O4,Skea,0,0
++3,H3,Reach Dun Eilean,0,0
++1,H3,Dun Eilean,0,0
++3,C10,Reach Alt Muirac,0,0
++3,C10,Alt Muirac,0,0

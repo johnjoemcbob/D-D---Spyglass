@@ -1,8 +1,12 @@
 date,hex,name,priority,teleport?
-12/07/1429,H2,Born,0,0
-13/05/1447,F1,Kidnapped by Goblins,0,0
-17/05/1447,F1,Rescued by party,0,0
-19/05/1447,I2,Join party,0,0
+09/05/1447,O4,Board Ban Sidhe,0,0
+13/05/1447,L3,PLAY STARTS,0,0
+14/05/1447,H2,Reach Dun Eilean,0,0
+15/05/1447,F1,Outside The Tomb of the Ordained Ascender,0,0
+16/05/1447,H2,Back to Dun Eilean,0,0
+17/05/1447,F1,Enter The Tomb,0,0
+18/05/1447,I2,Seek The Urchin,0,0
+19/05/1447,I2,Censor Attacks,0,0
 20/05/1447,I1,Find The Urchin,0,0
 21/05/1447,H1,Back to Tomb,0,0
 22/05/1447,F1,Free Kalerol,0,0
@@ -12,7 +16,6 @@ date,hex,name,priority,teleport?
 26/05/1447,H2,Extended Rest,0,0
 01/06/1447,H2,Dun Eilean Attacked!,0,0
 02/06/1447,G2,Goblin Camp,0,0
-02/06/1447,H2,Dun Eilean,0,0
 03/06/1447,H3,Ban Sidhe,0,0
 04/06/1447,G4,Ban Sidhe,0,0
 05/06/1447,G5,Ban Sidhe,0,0
@@ -24,10 +27,3 @@ date,hex,name,priority,teleport?
 11/06/1447,C9,Ban Sidhe,0,0
 12/06/1447,C10,Reach Alt Muirac,0,0
 13/06/1447,B10,Alt Muirac,0,0
-14/06/1447,D10,Travel To Koir,0,0
-15/06/1447,E12,Travel To Koir,0,0
-16/06/1447,F13,Travel To Koir,0,0
-17/06/1447,E14,Travel To Koir,0,0
-18/06/1447,D15,Reach Koir,0,0
-19/06/1447,D16,Journey to The Workshop of JoY,0,0
-20/06/1447,E17,???,0,0

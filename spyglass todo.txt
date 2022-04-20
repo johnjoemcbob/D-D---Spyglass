@@ -6,8 +6,6 @@ change client view to circle on admin ui
 
 
 
-locations + timeline
-dates
 
 
 
@@ -45,3 +43,5 @@ kalerol tower
 stop seeing through objects!
 especially under the map - k tower lol
 ui to control k tower and sync it to phone too
+locations + timeline
+dates
