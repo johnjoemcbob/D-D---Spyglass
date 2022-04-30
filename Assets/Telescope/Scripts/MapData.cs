@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,8 @@ using UnityEditor;
 [ExecuteInEditMode]
 public class MapData : MonoBehaviour
 {
+    public const int YOFF = 4;
+
     public static MapData Instance;
 
     [Serializable]
@@ -45,14 +48,71 @@ public class MapData : MonoBehaviour
 	private void Awake()
 	{
         Instance = this;
-	}
-
-#if UNITY_EDITOR
-	void Start()
-    {
-        
     }
 
+    void Start()
+    {
+        if ( Application.isPlaying )
+        {
+            // Load file
+            string path = Path.Combine( Application.streamingAssetsPath, "Data/hexes_discovered.txt" );
+
+            // Each line is a hex code
+            string[] lines = File.ReadAllLines( path );
+
+            // Convert hex code to array indices
+            foreach ( var hex in lines )
+            {
+                int col = (int) ( hex[0] - 'A' );
+                HexColumn hexcol = Hexes[col];
+                int num = int.Parse( hex.Replace( hex[0].ToString(), "" ) );
+                int row = num - hexcol.YOffset - YOFF;
+
+                // Get object and disable the fogofwar child
+                hexcol.Instances[row].transform.Find( "HexTileAddons" ).Find( "FogOfWar" ).GetComponent<MeshRenderer>().enabled = false;
+            }
+        }
+    }
+
+    public void DiscoverTile( GameObject obj )
+    {
+        obj.transform.Find( "HexTileAddons" ).Find( "FogOfWar" ).GetComponent<MeshRenderer>().enabled = false;
+
+        string hexstring = "";
+        int x = 0;
+        char label_letter = 'A';
+        foreach ( var col in Hexes )
+        {
+            int y = YOFF + col.YOffset;
+			foreach ( var row in col.Instances )
+			{
+                if ( row == obj )
+                {
+                    hexstring = label_letter + y.ToString();
+                    break;
+				}
+                y++;
+            }
+            if ( hexstring != "" )
+			{
+                break;
+			}
+            x++;
+            label_letter++;
+        }
+
+        // Store out new line
+        string path = Path.Combine( Application.streamingAssetsPath, "Data/hexes_discovered.txt" );
+        string[] lines = File.ReadAllLines( path );
+		{
+            var combine = new List<string>( lines );
+            combine.Add( hexstring );
+            lines = combine.ToArray();
+		}
+        File.WriteAllLines( path, lines );
+    }
+
+#if UNITY_EDITOR
     void Update()
     {
         if ( Regen )
@@ -114,7 +174,7 @@ public class MapData : MonoBehaviour
     public Vector3 GetHexWorldPos( Vector2 hex )
 	{
         var hexcol = Hexes[(int) hex.x];
-        float off = hex.y - 4 - hexcol.YOffset; // wtf
+        float off = hex.y - YOFF - hexcol.YOffset; // wtf
         var obj = hexcol.Instances[(int) off];
         return obj.transform.position;
     }

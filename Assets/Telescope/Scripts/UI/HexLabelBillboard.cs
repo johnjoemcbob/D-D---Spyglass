@@ -6,6 +6,7 @@ public class HexLabelBillboard : MonoBehaviour
 {
     void Update()
     {
+        // Currently disabled in HexAddon prefab
         if ( Compass.Instance != null )
         {
             //transform.LookAt( Compass.Instance.Camera.transform );

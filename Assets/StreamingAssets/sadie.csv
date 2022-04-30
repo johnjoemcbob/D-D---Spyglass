@@ -1,4 +1,4 @@
-date,hex,name,priority,teleport?
+date,hex,name,priority,teleport?,#79F8FF
 25/06/1443,N8,Start University,0,0
 10/04/1447,N8,Mission Recieved,0,0
 11/04/1447,K7,Travel to Callaird,0,0
@@ -18,3 +18,13 @@ date,hex,name,priority,teleport?
 12/06/1447,C10,Reach Alt Muirac,0,0
 13/06/1447,B10,Sadie makes her report!,3,0
 14/06/1447,A9,Sternwater,0,0
++7,A9,Sternwater,0,0
++1,B10,Return to Alt Muirac,0,0
++1,D10,Travel To Pirn,0,0
++1,E12,Travel To Pirn,0,0
++1,F13,Travel To Pirn,0,0
++1,E14,Travel To Pirn,0,0
++1,F15,Travel To Pirn,0,0
++1,H15,Travel to Pirn,0,0
++7,H15,Pirn,0,0
++1,F15,Travel to Grimsby,0,0

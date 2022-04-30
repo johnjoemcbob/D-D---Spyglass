@@ -14,24 +14,33 @@ public enum KeyframePriority
     Shockwave
 }
 
+public enum Existence
+{
+    Alive,
+    Born,
+    Die
+}
+
 public struct CharacterEventKeyframe
 {
     public string EventName;
     public DateTime Date;
     public string PrettyDate;
     public KeyframePriority Priority;
-    public bool Teleport;
+    public Existence Exist;
     public Vector2 Hex;
 }
 
 // From https://github.com/tiago-peres/blog/blob/master/csvreader/CSVReader.cs
 public class Timeline : MonoBehaviour
 {
+    public static Timeline Instance;
+
     static string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
     static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
 
     [Header( "Variables" )]
-    public Color[] Colours;
+    public List<Color> Colours;
     public float CharacterLineOffset = 5;
     public float LerpSpeed = 5;
 
@@ -39,12 +48,16 @@ public class Timeline : MonoBehaviour
     public Slider TimelineSlider;
     public Text CurrentDateText;
     public Transform ScreenPriorityMessageParent;
+    public Transform CharacterLocationParent;
+    public Transform CharacterKeyParent;
 
     [Header( "Assets" )]
     public GameObject LinePrefab;
     public GameObject SliderLabelPrefab;
     public GameObject ScreenPriorityPrefab;
     public GameObject ShockwavePriorityPrefab;
+    public GameObject CharacterLocationPrefab;
+    public GameObject CharacterKeyPrefab;
 
     // List of all character name instances in loaded
     public List<string> Characters = new List<string>();
@@ -52,27 +65,38 @@ public class Timeline : MonoBehaviour
     Dictionary<string, LineRenderer> TimelineLines = new Dictionary<string, LineRenderer>();
     Dictionary<string, Vector3[]> TimelineTargets = new Dictionary<string, Vector3[]>();
     List<string> UniqueDates = new List<string>();
+    List<CharacterLocationPie> LocationPies = new List<CharacterLocationPie>();
+    private int CurrentDateIndex = 0;
 
-    void Start()
+	private void Awake()
+	{
+        Instance = this;
+	}
+
+	void Start()
     {
         LoadAllCharacters();
         SetupSlider();
+        InitCharacterLocations();
         OnTimelineSliderValueChanged( 0 );
+        InitCharacterKeys();
     }
 
     void Update()
     {
         UpdateTimelineLines();
 
-        if ( Input.GetKeyDown( KeyCode.RightArrow ) )
-		{
-            TimelineSlider.value = TimelineSlider.value + 1;
-		}
+  //      if ( Input.GetKeyDown( KeyCode.RightArrow ) )
+		//{
+  //          TimelineSlider.value = TimelineSlider.value + 1;
+		//}
     }
 
 	#region LoadCSV
 	void LoadAllCharacters()
 	{
+        Colours.Clear();
+
         DirectoryInfo dir = new DirectoryInfo( Application.streamingAssetsPath );
         FileInfo[] info = dir.GetFiles( "*.csv" );
         foreach ( FileInfo f in info )
@@ -98,6 +122,11 @@ public class Timeline : MonoBehaviour
             CharacterEventKeyframe last = new CharacterEventKeyframe();
             var lines = Regex.Split( csvfile, LINE_SPLIT_RE );
             var header = Regex.Split( lines[0], SPLIT_RE );
+            Color col;
+			{
+                ColorUtility.TryParseHtmlString( header[5], out col );
+            }
+            Colours.Add( col );
             for ( var line = 1; line < lines.Length; line++ )
             {
                 CharacterEventKeyframe frame = new CharacterEventKeyframe();
@@ -127,8 +156,8 @@ public class Timeline : MonoBehaviour
 
                     frame.EventName = split[2];
                     frame.Priority = (KeyframePriority) int.Parse( split[3] );
-                    frame.Teleport = split[4] == "1";
-				}
+                    frame.Exist = (Existence) int.Parse( split[4] );
+                }
                 events.Add( frame );
                 last = frame;
             }
@@ -254,10 +283,77 @@ public class Timeline : MonoBehaviour
             line.SetPositions( poses );
         }
     }
+    #endregion
+
+    #region Character Locations
+    void InitCharacterLocations()
+	{
+		// Max number of characters in case all on different hexes
+		for ( int i = 0; i < Characters.Count; i++ )
+        {
+            // Create the prefab pool
+            GameObject loc = Instantiate( CharacterLocationPrefab, CharacterLocationParent );
+            var pie = loc.GetComponentInChildren<CharacterLocationPie>();
+            pie.Initialise( Colours );
+            LocationPies.Add( pie );
+        }
+	}
+
+    void RefreshCharacterLocations()
+	{
+		// Unlink all pie instances
+		foreach ( var pie in LocationPies )
+		{
+            pie.Reset();
+        }
+
+        // For each line
+        int nextpie = 0;
+        int character = 0;
+        foreach ( var line in TimelineTargets )
+        {
+            if ( TimelineLines[line.Key].enabled )
+            {
+                var timeline = CharacterTimelines[line.Key];
+                DateTime currentdate = DateTime.Parse( UniqueDates[CurrentDateIndex] );
+                int index = GetClosestDateIndex( timeline, currentdate );
+                if ( timeline[index].Exist == Existence.Alive )
+                {
+                    int count = line.Value.Length;
+                    var pos = line.Value[count - 1];
+
+                    // Check if there is a pie instance on this hex already
+                    int found = -1;
+                    for ( int i = 0; i < LocationPies.Count; i++ )
+                    {
+                        var pie = LocationPies[i];
+                        if ( pie.CurrentCharacter != -1 && pie.CurrentPos == pos )
+                        {
+                            found = i;
+                            break;
+                        }
+                    }
+                    if ( found >= 0 )
+                    {
+                        LocationPies[found].SetValue( character, 1 );
+                    }
+                    else
+                    {
+                        // Place the next pie based on hex to screen pos
+                        LocationPies[nextpie].CurrentCharacter = character;
+                        LocationPies[nextpie].SetPos( pos );
+                        LocationPies[nextpie].SetValue( character, 1 );
+                        nextpie++;
+                    }
+                }
+            }
+            character++;
+        }
+    }
 	#endregion
 
 	#region Slider
-    void SetupSlider()
+	void SetupSlider()
 	{
         TimelineSlider.maxValue = UniqueDates.Count - 1;
     }
@@ -265,7 +361,8 @@ public class Timeline : MonoBehaviour
     public void OnTimelineSliderValueChanged( float value )
 	{
         // Get date by UniqueDates[(int) value]
-        string prettydate = UniqueDates[(int) value];
+        CurrentDateIndex = (int) value;
+        string prettydate = UniqueDates[CurrentDateIndex];
         DateTime currentdate = DateTime.Parse( prettydate );
 
         // Show this date on the current date text display
@@ -298,26 +395,36 @@ public class Timeline : MonoBehaviour
 
             ProcessTimelineLine( timeline.Key, timeline.Value );
 
-            int index = 0;
-            foreach ( var frame in timeline.Value )
-            {
-                if ( frame.Date <= currentdate )
-                {
-                    index++;
-                }
-            }
-            if ( index != 0 )
-			{
-                index--;
-			}
+            int index = GetClosestDateIndex( timeline.Value, currentdate );
             HandlePriority( timeline.Key, timeline.Value[index] );
         }
+
+        RefreshCharacterLocations();
+    }
+
+    int GetClosestDateIndex( List<CharacterEventKeyframe> timeline, DateTime currentdate )
+	{
+        int index = 0;
+        foreach ( var frame in timeline )
+        {
+            if ( frame.Date <= currentdate )
+            {
+                index++;
+            }
+        }
+        if ( index != 0 )
+        {
+            index--;
+        }
+        return index;
     }
 	#endregion
 
 	#region Priorities
     void HandlePriority( string character, CharacterEventKeyframe frame )
 	{
+        if ( !TimelineLines[character].enabled ) return;
+
 		switch ( frame.Priority )
 		{
 			case KeyframePriority.Normal:
@@ -390,6 +497,42 @@ public class Timeline : MonoBehaviour
         shock.transform.position = MapData.Instance.GetHexWorldPos( frame.Hex );
         shock.transform.position += Vector3.up * 5;
         shock.GetComponent<SpriteRenderer>().color = Colours[Characters.IndexOf( character )];
+    }
+	#endregion
+
+	#region Key
+    void InitCharacterKeys()
+    {
+        for ( int i = 0; i < Characters.Count; i++ )
+        {
+            // Create the keys
+            GameObject loc = Instantiate( CharacterKeyPrefab, CharacterKeyParent );
+            var col = loc.GetComponentInChildren<ColourCharacter>( true );
+            col.Init( Characters[i], Colours[i] );
+            loc.GetComponentInChildren<Text>().text = Characters[i];
+            loc.GetComponent<ToggleCharacter>().Character = Characters[i];
+        }
+    }
+
+    public void ToggleCharacter( string character, bool toggle )
+	{
+        TimelineLines[character].enabled = toggle;
+        OnTimelineSliderValueChanged( TimelineSlider.value );
+    }
+
+    public void SetColour( string character, Color colour )
+    {
+        int index = 0;
+		foreach ( var c in Characters )
+		{
+            if ( c == character )
+			{
+                break;
+			}
+            index++;
+		}
+        Colours[index] = colour;
+        OnTimelineSliderValueChanged( TimelineSlider.value );
     }
     #endregion
 }

@@ -1,8 +1,6 @@
 dnd timeline
 
 
-teleport?
-
 
 ui
 character toggle list
@@ -16,10 +14,29 @@ option to have 2d ui key on map itself
 	name, colour, maybe pic
 
 
-sadie
-
 repeat option in csv - 5-repeat-10
 (repeat the previous 5 date offsets, 10 times)
+
+
+
+
+sadie?
+
+
+
+better shockwave
+
+
+add level ups to the timeline
+
+
+smaller pie charts
+pie charts as world canvases? so its blocked by fog of war
+
+
+
+
+
 
 done
 basic csv
@@ -48,3 +65,6 @@ priorities
 	1 - show on timeline ui
 	2 - show text on screen
 	3 - shockwave out of location
+add pie charts to each hex, showing characters currently there?
+	or circles along circumference
+options to start/stop existance of characters at certain dates

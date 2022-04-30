@@ -1,4 +1,4 @@
-date,hex,name,priority,teleport?
+date,hex,name,priority,teleport?,#D679FF
 12/07/1429,H2,Born,0,0
 13/05/1447,F1,Kidnapped by Goblins,0,0
 17/05/1447,F1,Rescued by party,0,0
@@ -24,10 +24,23 @@ date,hex,name,priority,teleport?
 11/06/1447,C9,Ban Sidhe,0,0
 12/06/1447,C10,Reach Alt Muirac,0,0
 13/06/1447,B10,Alt Muirac,0,0
-14/06/1447,D10,Travel To Koir,0,0
-15/06/1447,E12,Travel To Koir,0,0
-16/06/1447,F13,Travel To Koir,0,0
-17/06/1447,E14,Travel To Koir,0,0
+14/06/1447,D10,Travel to Koir,0,0
+15/06/1447,E12,Travel to Koir,0,0
+16/06/1447,F13,Travel to Koir,0,0
+17/06/1447,E14,Travel to Koir,0,0
 18/06/1447,D15,Reach Koir,0,0
 19/06/1447,D16,Journey to The Workshop of JoY,0,0
-20/06/1447,E17,???,0,0
+20/06/1447,E17,Workshop,0,0
+21/06/1447,E17,Bess owns The Workshop,3,0
+22/06/1447,D15,Return to Koir,0,0
+23/06/1447,E17,Return to The Workshop,0,0
++1,E17,Extended Rest,0,0
++1,E17,Extended Rest,0,0
++1,E17,Extended Rest,0,0
++1,E17,Extended Rest,0,0
++1,E17,Extended Rest,0,0
++1,E17,Extended Rest,0,0
++1,E17,Extended Rest,0,0
+08/07/1447,G1,The Gang Teleport to DE,3,0
++1,F1,The Gang Reach The Vault,2,0
++1,F1,The Vault,0,0
