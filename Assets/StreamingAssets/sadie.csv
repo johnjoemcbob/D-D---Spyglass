@@ -26,5 +26,13 @@ date,hex,name,priority,teleport?,#79F8FF
 +1,E14,Travel To Pirn,0,0
 +1,F15,Travel To Pirn,0,0
 +1,H15,Travel to Pirn,0,0
-+7,H15,Pirn,0,0
++5,H15,Pirn,0,0
++1,F15,Travel to DE,0,0
++1,E14,Travel to DE,0,0
++1,G13,Travel to DE,0,0
++1,D11,Travel to DE,0,0
++1,D6,Travel to DE,0,0
++1,F5,Travel to DE,0,0
++1,H3,Travel to DE,0,0
++1,H2,Dun Eilean,0,0
 +1,F15,Travel to Grimsby,0,0

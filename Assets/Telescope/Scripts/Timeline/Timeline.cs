@@ -197,7 +197,7 @@ public class Timeline : MonoBehaviour
 
         // Get the current date
         Vector3 lastpos = MapData.Instance.GetHexWorldPos( events[0].Hex );
-        string startdate = CurrentDateText.text;
+        string startdate = CurrentDateText.text.Split( '-' )[0];
         int range = 5;
 		for ( int offset = -range; offset <= 0; offset++ )
 		{
@@ -366,7 +366,7 @@ public class Timeline : MonoBehaviour
         DateTime currentdate = DateTime.Parse( prettydate );
 
         // Show this date on the current date text display
-        CurrentDateText.text = prettydate;
+        CurrentDateText.text = prettydate + " - " + currentdate.DayOfWeek.ToString();
 
 		// For each CSV, find that date's last index occurance
 		foreach ( var timeline in CharacterTimelines )

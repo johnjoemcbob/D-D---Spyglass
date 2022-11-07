@@ -25,3 +25,12 @@ date,hex,name,priority,teleport?,#FFFD79
 +2,H17,Travel To Low Temple,0,0
 +2,H18,Travel To Low Temple,0,0
 +1,H18,Low Temple,0,0
++30,H17,Return from pilgrimage,0,0
++1,G16,Reach Lamthalal,0,0
++1,G16,Lamthalal,0,0
++1,E15,Reach Koir,0,0
++1,E15,Koir,0,0
++1,G13,Reach Bunree,0,0
++1,G13,Bunree,0,0
++1,C10,Reach Alt Muirac,0,0
++1,B10,Alt Muirac,0,0

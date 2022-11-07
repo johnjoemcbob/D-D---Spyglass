@@ -14,6 +14,7 @@ date,hex,name,priority,teleport?,#FF798B
 10/06/1447,D8,Ban Sidhe,0,0
 11/06/1447,C9,Ban Sidhe,0,0
 12/06/1447,C10,Reach Alt Muirac,0,0
+13/06/1447,B10,Scrangler Victim,0,0
 +1,D10,Travel To Bunree,0,0
 +1,E12,Travel To Bunree,0,0
 +1,G13,Travel To Bunree,0,0
@@ -22,3 +23,5 @@ date,hex,name,priority,teleport?,#FF798B
 +1,J13,Tower,0,0
 +1,J13,Kalerol's up to no good,3,0
 +1,J13,Tower,0,0
+08/07/1447,H2,Teleport Victims,0,0
+11/07/1447,H2,Approach party,0,0

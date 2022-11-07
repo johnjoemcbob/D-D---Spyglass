@@ -30,8 +30,6 @@ better shockwave
 add level ups to the timeline
 
 
-smaller pie charts
-pie charts as world canvases? so its blocked by fog of war
 
 
 
@@ -68,3 +66,5 @@ priorities
 add pie charts to each hex, showing characters currently there?
 	or circles along circumference
 options to start/stop existance of characters at certain dates
+smaller pie charts
+pie charts as world canvases? so its blocked by fog of war

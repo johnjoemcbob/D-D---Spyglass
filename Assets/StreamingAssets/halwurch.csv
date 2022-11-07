@@ -58,5 +58,7 @@ date,hex,name,priority,teleport?,#7D79FF
 +1,O4,Skea,0,0
 +3,H3,Reach Dun Eilean,0,0
 +1,H3,Dun Eilean,0,0
-+3,C10,Reach Alt Muirac,0,0
-+3,C10,Alt Muirac,0,0
++1,F6,Reach Alt Muirac,0,0
++1,H3,Called back to DE,0,0
++1,H2,Dun Eilean,0,0
++1,H1,Ambassador Halwurch,0,0
