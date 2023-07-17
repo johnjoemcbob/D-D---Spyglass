@@ -9,6 +9,12 @@ EditorBuildSettings:
     path: Assets/Telescope/Scenes/admin.unity
     guid: 1a2240f791fd6954ea3d1d4b94fde1f8
   - enabled: 1
+    path: Assets/Telescope/Scenes/test.unity
+    guid: 69e1d3ee3ee5bfb4bb356e1945bbef07
+  - enabled: 1
+    path: Assets/Telescope/Scenes/watch.unity
+    guid: 4bd54b9939c30b347964808d643c8986
+  - enabled: 1
     path: Assets/Telescope/Scenes/client.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects: {}

@@ -25,3 +25,30 @@ date,hex,name,priority,teleport?,#FF798B
 +1,J13,Tower,0,0
 08/07/1447,H2,Teleport Victims,0,0
 11/07/1447,H2,Approach party,0,0
+13/07/1447,F1,Battle!,0,0
+15/07/1447,F1,Kalerol gains Codex!,3,0
++1,J13,Kalerol Gains Codex!,0,0
++4,J13,Study Codex,0,0
++1,H12,Travel to Bunree,0,0
++30,H12,Corrupt Bunree,0,0
++1,H12,Bunree Falls,3,0
++1,J13,Travel to Tower,0,0
++10,J13,Build Tower,0,0
++1,H15,Travel to Pirn,0,0
++15,H15,Corrupt Pirn,0,0
++1,H15,Pirn Falls,3,0
++1,J13,Travel to Tower,0,0
++5,J13,Build Tower,0,0
++1,F15,Travel to Lamthalal,0,0
++1,H17,Travel to Lamthalal,0,0
++30,H17,Corrupt Lamthalal,0,0
++1,F15,Travel to Tower,0,0
++1,J13,Travel to Tower,0,0
++5,J13,Build Tower,0,0
++1,F15,Travel to Lamthalal,0,0
++1,H17,Travel to Lamthalal,0,0
++30,H17,Corrupt Lamthalal,0,0
++1,H17,Lamthalal Falls,3,0
++1,F15,Travel to Tower,0,0
++1,J13,Travel to Tower,0,0
++5,J13,Build Tower,0,0

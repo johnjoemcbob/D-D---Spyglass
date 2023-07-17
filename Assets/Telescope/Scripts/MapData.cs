@@ -78,38 +78,64 @@ public class MapData : MonoBehaviour
     {
         obj.transform.Find( "HexTileAddons" ).Find( "FogOfWar" ).GetComponent<MeshRenderer>().enabled = false;
 
-        string hexstring = "";
-        int x = 0;
-        char label_letter = 'A';
-        foreach ( var col in Hexes )
-        {
-            int y = YOFF + col.YOffset;
-			foreach ( var row in col.Instances )
-			{
-                if ( row == obj )
-                {
-                    hexstring = label_letter + y.ToString();
-                    break;
-				}
-                y++;
-            }
-            if ( hexstring != "" )
-			{
-                break;
-			}
-            x++;
-            label_letter++;
-        }
+        string hexstring = GetHexFromObject( obj );
 
         // Store out new line
         string path = Path.Combine( Application.streamingAssetsPath, "Data/hexes_discovered.txt" );
         string[] lines = File.ReadAllLines( path );
 		{
             var combine = new List<string>( lines );
-            combine.Add( hexstring );
+            if ( !combine.Contains( hexstring ) )
+            {
+                combine.Add( hexstring );
+            }
             lines = combine.ToArray();
 		}
         File.WriteAllLines( path, lines );
+    }
+
+    public void HideTile( GameObject obj )
+    {
+        obj.transform.Find( "HexTileAddons" ).Find( "FogOfWar" ).GetComponent<MeshRenderer>().enabled = true;
+
+        string hexstring = GetHexFromObject( obj );
+
+        // Store out new line
+        string path = Path.Combine( Application.streamingAssetsPath, "Data/hexes_discovered.txt" );
+        string[] lines = File.ReadAllLines( path );
+        {
+            var combine = new List<string>( lines );
+            combine.Remove( hexstring );
+            lines = combine.ToArray();
+        }
+        File.WriteAllLines( path, lines );
+    }
+
+    public string GetHexFromObject( GameObject obj )
+	{
+        string hexstring = "";
+        int x = 0;
+        char label_letter = 'A';
+        foreach ( var col in Hexes )
+        {
+            int y = YOFF + col.YOffset;
+            foreach ( var row in col.Instances )
+            {
+                if ( row == obj )
+                {
+                    hexstring = label_letter + y.ToString();
+                    break;
+                }
+                y++;
+            }
+            if ( hexstring != "" )
+            {
+                break;
+            }
+            x++;
+            label_letter++;
+        }
+        return hexstring;
     }
 
 #if UNITY_EDITOR

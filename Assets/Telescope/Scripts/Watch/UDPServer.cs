@@ -18,6 +18,7 @@ public class UDPServer : MonoBehaviour
 
     RenderTexture rt;
     byte[] CamData;
+    int CompassRotation;
 
     void Start()
     {
@@ -37,6 +38,7 @@ public class UDPServer : MonoBehaviour
     private void Update()
 	{
         CamData = GetImageBytes();
+        CompassRotation = (int) Spyglass.Instance.transform.eulerAngles.y;
     }
 
 	private void ListenForMessages()
@@ -48,17 +50,26 @@ public class UDPServer : MonoBehaviour
             IPEndPoint remoteEndPoint = new IPEndPoint( IPAddress.Any, _port );
             byte[] data = _udpClient.Receive( ref remoteEndPoint );
             string message = Encoding.ASCII.GetString( data );
-            Spyglass.Instance.ReceiveGyro( message );
-
-            if ( CamData != null )
+            if ( message == "c" )
             {
-                // Send an image back
-                byte[] bytes = BitConverter.GetBytes( CamData.Length );
+                byte[] bytes = BitConverter.GetBytes( CompassRotation );
                 Array.Reverse( bytes );
-                byte[] combinedArray = new byte[bytes.Length + CamData.Length];
-                Array.Copy( bytes, 0, combinedArray, 0, bytes.Length );
-                Array.Copy( CamData, 0, combinedArray, bytes.Length, CamData.Length );
-                _udpClient.Send( combinedArray, combinedArray.Length, remoteEndPoint );
+                _udpClient.Send( bytes, bytes.Length, remoteEndPoint );
+            }
+            else
+            {
+                Spyglass.Instance.ReceiveGyro( message );
+
+                if ( CamData != null )
+                {
+                    // Send an image back
+                    byte[] bytes = BitConverter.GetBytes( CamData.Length );
+                    Array.Reverse( bytes );
+                    byte[] combinedArray = new byte[bytes.Length + CamData.Length];
+                    Array.Copy( bytes, 0, combinedArray, 0, bytes.Length );
+                    Array.Copy( CamData, 0, combinedArray, bytes.Length, CamData.Length );
+                    _udpClient.Send( combinedArray, combinedArray.Length, remoteEndPoint );
+                }
             }
         }
     }
