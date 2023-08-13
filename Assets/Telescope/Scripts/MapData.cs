@@ -63,20 +63,19 @@ public class MapData : MonoBehaviour
             // Convert hex code to array indices
             foreach ( var hex in lines )
             {
-                int col = (int) ( hex[0] - 'A' );
+                int col, row;
+                GetHexColumnRow( hex, out col, out row );
                 HexColumn hexcol = Hexes[col];
-                int num = int.Parse( hex.Replace( hex[0].ToString(), "" ) );
-                int row = num - hexcol.YOffset - YOFF;
 
                 // Get object and disable the fogofwar child
-                hexcol.Instances[row].transform.Find( "HexTileAddons" ).Find( "FogOfWar" ).GetComponent<MeshRenderer>().enabled = false;
+                UncoverTiles( hexcol.Instances[row] );
             }
         }
     }
 
     public void DiscoverTile( GameObject obj )
     {
-        obj.transform.Find( "HexTileAddons" ).Find( "FogOfWar" ).GetComponent<MeshRenderer>().enabled = false;
+        UncoverTiles( obj );
 
         string hexstring = GetHexFromObject( obj );
 
@@ -111,6 +110,47 @@ public class MapData : MonoBehaviour
         File.WriteAllLines( path, lines );
     }
 
+    void UncoverTiles( GameObject obj )
+    {
+        UncoverTile( obj );
+
+        // Uncover those around it
+        string hex = GetHexFromObject( obj );
+        int col, row;
+        GetHexColumnRow( hex, out col, out row );
+
+        // Left, center, & right
+        for ( int x = -1; x <= 1; x++ )
+        {
+            int offx = col + x;
+            if ( offx >= 0 && offx < Hexes.Length )
+            {
+                HexColumn hexcol = Hexes[offx];
+
+                // Up and down
+                for ( int y = -2; y <= 2; y++ )
+                {
+                    int offy = row + y;
+                    if ( offy >= 0 && offy < hexcol.Instances.Length )
+                    {
+                        // Need to be within range of original hex
+                        float dist = Vector3.Distance( obj.transform.position, hexcol.Instances[offy].transform.position );
+                        if ( dist < 30 )
+                        {
+                            UncoverTile( hexcol.Instances[offy] );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void UncoverTile( GameObject obj )
+    {
+        obj.transform.Find( "HexTileAddons" ).Find( "FogOfWar" ).GetComponent<MeshRenderer>().enabled = false;
+    }
+
+    #region Get
     public string GetHexFromObject( GameObject obj )
 	{
         string hexstring = "";
@@ -138,6 +178,24 @@ public class MapData : MonoBehaviour
         return hexstring;
     }
 
+    void GetHexColumnRow( string hex, out int col, out int row )
+    {
+        col = (int) ( hex[0] - 'A' );
+        HexColumn hexcol = Hexes[col];
+        int num = int.Parse( hex.Replace( hex[0].ToString(), "" ) );
+        row = num - hexcol.YOffset - YOFF;
+    }
+
+    public Vector3 GetHexWorldPos( Vector2 hex )
+    {
+        var hexcol = Hexes[(int) hex.x];
+        float off = hex.y - YOFF - hexcol.YOffset; // wtf
+        var obj = hexcol.Instances[(int) off];
+        return obj.transform.position;
+    }
+    #endregion
+
+    #region Generation
 #if UNITY_EDITOR
     void Update()
     {
@@ -196,12 +254,5 @@ public class MapData : MonoBehaviour
         }
     }
 #endif
-
-    public Vector3 GetHexWorldPos( Vector2 hex )
-	{
-        var hexcol = Hexes[(int) hex.x];
-        float off = hex.y - YOFF - hexcol.YOffset; // wtf
-        var obj = hexcol.Instances[(int) off];
-        return obj.transform.position;
-    }
+	#endregion
 }

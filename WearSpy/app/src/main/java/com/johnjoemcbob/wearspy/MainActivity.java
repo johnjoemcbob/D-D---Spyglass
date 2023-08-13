@@ -4,6 +4,7 @@ import static android.content.Context.POWER_SERVICE;
 import static android.content.Context.SENSOR_SERVICE;
 
 import android.Manifest;
+import android.bluetooth.BluetoothManager;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -23,25 +24,65 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ImageView;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.widget.Toast;
+
+import java.util.Set;
+
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = 123;
+    private static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 100;
 
     private SensorManager sensorManager;
     private Sensor gyroSensor;
-    private Sensor rotationSensor;
     private TextView textView;
+
+    private BluetoothAdapter mBluetoothAdapter;
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d("BluetoothDebug", "On Receive");
+            Log.d("BluetoothDebug", action);
+            Toast.makeText(context, action, Toast.LENGTH_LONG).show();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                String deviceName = device.getName();
+                String deviceAddress = device.getAddress(); // MAC address
+                // Add the device to your list or adapter
+                Toast.makeText(context, deviceName, Toast.LENGTH_LONG).show();
+            }
+            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
+                Toast.makeText(context, "Discovery Started", Toast.LENGTH_SHORT).show();
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                Toast.makeText(context, "Discovery Finished", Toast.LENGTH_SHORT).show();
+            } else if (BluetoothAdapter.ACTION_SCAN_MODE_CHANGED.equals(action)) {
+                int scanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
+                if (scanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+                    Toast.makeText(context, "Device is in discoverable mode", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Device is not in discoverable mode", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    };
 
     private ImageView imageView;
     private String Gyro;
     private PowerManager.WakeLock wakeLock;
-    private String Status = "";
+    //private String Status = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +96,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_REQUEST_COARSE_LOCATION);
-            Status += "Req|";
+            //Status += "Req|";
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_FINE_LOCATION);
+            //Status += "Req|";
         }
         else
         {
@@ -66,193 +112,93 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_COARSE_LOCATION: {
+            case MY_PERMISSIONS_REQUEST_COARSE_LOCATION:
+            case MY_PERMISSIONS_REQUEST_FINE_LOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Status += "Gra|";
+                    //Status += "Gra|";
                     StartAfterPermission();
                 } else {
                     // permission denied, Disable the functionality that depends on this permission.
                 }
                 return;
             }
-
-            // other 'case' lines to check for other permissions your app might request
-        }
-    }
-
-    float[] mGravity;
-    float[] mGeomagnetic;
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            Gyro = event.values[0] + "|" +
-                    event.values[1] + "|" +
-                    event.values[2];
-            //textView.setText(Status + "\n" + Gyro);
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // You might want to implement behavior here if you care about sensor accuracy changes
-        if (sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            //Status = String.valueOf(accuracy);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        sensorManager.registerListener(this, gyroSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        // Stay awake
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyApp::MyWakelockTag");
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        // Acquire the WakeLock to keep the CPU running
-        wakeLock.acquire(4*60*60*1000L /*4 hours*/);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        sensorManager.unregisterListener(this);
-
-        // Always release the WakeLock when it's not needed
-        if (wakeLock != null && wakeLock.isHeld()) {
-            wakeLock.release();
-            wakeLock = null;
-        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        handler.removeCallbacks(refreshRunnable);
-        sensorManager.unregisterListener(this);
 
-        // Always release the WakeLock when it's not needed
-        if (wakeLock != null && wakeLock.isHeld()) {
-            wakeLock.release();
-            wakeLock = null;
-        }
+        unregisterReceiver(mReceiver);
     }
 
     public void StartAfterPermission() {
-        Status += "Sta|";
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
-        List<Sensor> deviceSensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
-
-        for (Sensor sensor : deviceSensors) {
-            Log.i("SensorList", "Sensor name: " + sensor.getName() + ", type: " + sensor.getType());
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+            return;
         }
 
-        if (gyroSensor == null) {
-            textView.setText("This device has no gyroscope");
-            finish();
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, 1);
+        }
+
+        // Register for broadcasts when a device is discovered
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("com.example.MY_CUSTOM_ACTION");
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        filter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        registerReceiver(mReceiver, filter);
+
+        // Start discovery
+        if (mBluetoothAdapter.isDiscovering()) {
+            mBluetoothAdapter.cancelDiscovery();
+        }
+        boolean started = mBluetoothAdapter.startDiscovery();
+        if (started) {
+            Toast.makeText(this, "Discovery started successfully", Toast.LENGTH_SHORT).show();
+            Log.d("BluetoothDebug", "Discovery started!");
         } else {
-            sensorManager.registerListener(this, gyroSensor, SensorManager.SENSOR_DELAY_FASTEST);
-        }
-        Status += "Lis|";
-
-        // Stay awake
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyApp::MyWakelockTag");
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        // Acquire the WakeLock to keep the CPU running
-        wakeLock.acquire();
-        Status += "Loc|";
-
-        Gyro = "0|0|0";
-        new DownloadImageTask().execute();
-
-        handler.post(refreshRunnable);
-    }
-
-    private void refreshGyro() {
-        sensorManager.unregisterListener(this);
-        sensorManager.registerListener(this, gyroSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        //Status += "Gyr|";
-    }
-
-    private Handler handler = new Handler();
-
-    private Runnable refreshRunnable = new Runnable() {
-        @Override
-        public void run() {
-            refreshGyro();
-            handler.postDelayed(this, 1 * 1000);  // 1 seconds
-        }
-    };
-
-    private class DownloadImageTask extends AsyncTask<Void, Bitmap, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            DatagramSocket socket = null;
-            Bitmap bitmap = null;
-            System.out.println("try");
-            try {
-                int serverPort = 7691;
-                InetAddress host = InetAddress.getByName("192.168.0.26");
-                Status += "Try|";
-                System.out.println("Connecting to server " + host.getHostAddress() + " on port " + serverPort);
-
-                socket = new DatagramSocket();
-                socket.setSoTimeout(1000);
-                socket.connect(new InetSocketAddress(host, serverPort));
-
-                System.out.println("Just connected to " + socket.getRemoteSocketAddress());
-                Status += "Con|";
-
-                while (!isCancelled()) {
-                    byte[] sendBuffer = Gyro.getBytes();
-                    DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length, host, serverPort);
-                    socket.send(sendPacket);
-                    //Status += "Sen|";
-
-                    // Buffer for reading data
-                    byte[] buffer = new byte[10240];
-                    DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
-
-                    socket.receive(receivePacket);
-                    //Status += "Rec|";
-                    byte[] receivedData = receivePacket.getData();
-
-                    // Extract length prefix
-                    ByteBuffer wrapped = ByteBuffer.wrap(receivedData, 0, 4); // big-endian by default
-                    int num = wrapped.getInt();
-
-                    if (num > 0 && num <= (receivedData.length - 4)) {
-                        bitmap = BitmapFactory.decodeByteArray(receivedData, 4, num);
-                        //Status += "Bit|";
-                        publishProgress(bitmap);
-                    }
-                }
-            } catch (SocketTimeoutException e) {
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if(socket != null) {
-                    socket.close();
-                }
-                new DownloadImageTask().execute();
-            }
-            return null;
+            Toast.makeText(this, "Failed to start discovery", Toast.LENGTH_SHORT).show();
         }
 
-        @Override
-        protected void onProgressUpdate(Bitmap... bitmap) {
-            if (bitmap[0] != null) {
-                //Status += "Map|";
-                imageView.setImageBitmap(bitmap[0]);
-            }
+        Intent intent = new Intent("com.example.MY_CUSTOM_ACTION");
+        sendBroadcast(intent);
+
+        if (mBluetoothAdapter.isDiscovering()) {
+            Toast.makeText(this, "Discovery is active", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Discovery is not active", Toast.LENGTH_SHORT).show();
+        }
+
+        int state = mBluetoothAdapter.getState();
+        switch (state) {
+            case BluetoothAdapter.STATE_OFF:
+                Toast.makeText(this, "Bluetooth is off", Toast.LENGTH_SHORT).show();
+                break;
+            case BluetoothAdapter.STATE_TURNING_ON:
+                Toast.makeText(this, "Bluetooth is turning on", Toast.LENGTH_SHORT).show();
+                break;
+            case BluetoothAdapter.STATE_ON:
+                Toast.makeText(this, "Bluetooth is on", Toast.LENGTH_SHORT).show();
+                break;
+            case BluetoothAdapter.STATE_TURNING_OFF:
+                Toast.makeText(this, "Bluetooth is turning off", Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 }

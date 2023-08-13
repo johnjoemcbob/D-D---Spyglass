@@ -50,6 +50,7 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 				// Basic Info
 				stream.SendNext( BoatMover.Instance.transform.position );
 				stream.SendNext( KalerolsTower.Instance.CurrentFloorHeight );
+				stream.SendNext( GyroSpeedSlider.GyroModifier );
 			}
 		}
 		else
@@ -65,6 +66,7 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 			{
 				realPosition = (Vector3) stream.ReceiveNext();
 				KalerolsTower.Instance.CurrentFloorHeight = (float) stream.ReceiveNext();
+				GyroSpeedSlider.GyroModifier = (float) stream.ReceiveNext();
 			}
 		}
 	}

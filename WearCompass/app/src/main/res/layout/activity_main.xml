@@ -6,64 +6,39 @@
     tools:context=".MainActivity">
 
     <ImageView
+        android:id="@+id/imageViewRose"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:rotationX="0"
+        android:scaleType="center"
+        android:scaleX="0.7"
+        android:scaleY="0.7"
+        android:src="@drawable/rose_simple"
+        android:translationX="-10dp" />
+
+    <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:rotationX="0"
         android:scaleType="center"
-        android:scaleX="5"
-        android:scaleY="5"
-        android:src="?android:attr/textSelectHandle" />
+        android:scaleX="0.7"
+        android:scaleY="0.7"
+        android:src="@drawable/compass_simple"
+        android:translationX="-10dp" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="Hello World!" />
+        android:text="" />
 
-    <TextView
-        android:id="@+id/textViewNorth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:scaleX="2"
-        android:scaleY="2"
-        android:layout_marginTop="10dp"
-        android:text="N" />
-
-    <TextView
-        android:id="@+id/textViewSouth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:scaleX="2"
-        android:scaleY="2"
-        android:layout_marginBottom="10dp"
-        android:text="S" />
-
-    <TextView
-        android:id="@+id/textViewWest"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true"
-        android:scaleX="2"
-        android:scaleY="2"
-        android:layout_marginStart="10dp"
-        android:text="W" />
-
-    <TextView
-        android:id="@+id/textViewEast"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true"
-        android:scaleX="2"
-        android:scaleY="2"
-        android:layout_marginEnd="10dp"
-        android:text="E" />
+    <Button
+        android:id="@+id/buttonRecenter"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.0" />
 </RelativeLayout>

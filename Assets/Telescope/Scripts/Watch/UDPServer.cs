@@ -13,12 +13,13 @@ public class UDPServer : MonoBehaviour
     private Thread _udpServerThread;
     private UdpClient _udpClient;
     private int _port = 7691;
-    private int _width = 320;
-    private int _height = 320;
+    private int _width = 160;
+    private int _height = 160;
 
     RenderTexture rt;
     byte[] CamData;
     int CompassRotation;
+    bool RecenterRequested = false;
 
     void Start()
     {
@@ -28,6 +29,8 @@ public class UDPServer : MonoBehaviour
         }
 
         rt = new RenderTexture( _width, _height, 24 );
+        SpyglassTexture.width = _width;
+        SpyglassTexture.height = _height;
 
         _udpServerThread = new Thread( new ThreadStart( ListenForMessages ) );
         _udpServerThread.IsBackground = true;
@@ -39,6 +42,11 @@ public class UDPServer : MonoBehaviour
 	{
         CamData = GetImageBytes();
         CompassRotation = (int) Spyglass.Instance.transform.eulerAngles.y;
+        if ( RecenterRequested )
+		{
+            Spyglass.Instance.Recenter();
+            RecenterRequested = false;
+        }
     }
 
 	private void ListenForMessages()
@@ -56,6 +64,10 @@ public class UDPServer : MonoBehaviour
                 Array.Reverse( bytes );
                 _udpClient.Send( bytes, bytes.Length, remoteEndPoint );
             }
+            else if ( message == "r" )
+			{
+                RecenterRequested = true;
+			}
             else
             {
                 Spyglass.Instance.ReceiveGyro( message );

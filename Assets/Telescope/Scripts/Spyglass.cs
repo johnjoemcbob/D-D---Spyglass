@@ -11,6 +11,7 @@ public class Spyglass : MonoBehaviour
     public float ZoomDeadzone = 0.5f;
     public float MaxZoom = 2;
     public float PushbackMult = 0.8f;
+    public float GyroDirectionMult = 1;
     public bool Newer = false;
     public bool Manual = false;
     public bool OrientationSent = false;
@@ -54,8 +55,12 @@ public class Spyglass : MonoBehaviour
 
         if ( Input.GetKeyDown( KeyCode.Space ) )
 		{
-            transform.eulerAngles = new Vector3( 0, transform.eulerAngles.y, 0 );
-		}
+            Recenter();
+        }
+        if ( Input.GetKeyDown( KeyCode.F2 ) )
+        {
+            transform.eulerAngles += new Vector3( 0, 1, 0 );
+        }
 
         if ( Manual )
 		{
@@ -92,12 +97,12 @@ public class Spyglass : MonoBehaviour
             }
             if ( roll >= ZoomDeadzone )
             {
-                Zoom = MaxZoom;
+                //Zoom = MaxZoom;
                 transform.eulerAngles = new Vector3( 0, transform.eulerAngles.y, 0 );
             }
             if ( roll <= -ZoomDeadzone )
             {
-                Zoom = 1;
+                //Zoom = 1;
                 transform.eulerAngles = new Vector3( 0, transform.eulerAngles.y, 0 );
             }
             // Zoom separate slightly for sync network reasons
@@ -137,7 +142,7 @@ public class Spyglass : MonoBehaviour
         }
         else
         {
-            transform.eulerAngles += GyroToUnity( m_Gyro.rotationRate ) * Speed;
+            transform.eulerAngles += GyroToUnity( m_Gyro.rotationRate ) * GyroSpeedSlider.GyroModifier * GyroDirectionMult;
         }
     }
 
@@ -159,6 +164,11 @@ public class Spyglass : MonoBehaviour
     public void ReceiveGyro( Vector3 gyro )
     {
         ManualGyro = gyro;
+    }
+
+    public void Recenter()
+	{
+        transform.eulerAngles = new Vector3( 0, transform.eulerAngles.y, 0 );
     }
 
     private static Quaternion GyroToUnity( Quaternion q )
