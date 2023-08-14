@@ -6,6 +6,8 @@ public class KalerolsTower : MonoBehaviour
 {
     public static KalerolsTower Instance;
 
+    public static float CurrentFloorHeight;
+
     public float Speed = 5;
     public float YawSpeed = 1;
     public float FloorRotateSpeed = 1;
@@ -16,8 +18,6 @@ public class KalerolsTower : MonoBehaviour
     public Transform FloorsParent;
     public Transform[] Skulls;
 
-    [HideInInspector]
-    public float CurrentFloorHeight;
 
 	private void Awake()
 	{

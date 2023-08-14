@@ -40,17 +40,25 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 			// Client controls rotation, admin position
 			if ( admin == null )
 			{
+				var spyglass = Compass.Instance != null;
+				if ( spyglass )
+				{
+					Camera cam = Compass.Instance.Camera;
+					realRotation = cam.transform.parent.rotation;
+					realZoom = Spyglass.Instance.Zoom;
+				}
 				// Basic Info
-				Camera cam = Compass.Instance.Camera;
-				stream.SendNext( cam.transform.parent.rotation );
-				stream.SendNext( Spyglass.Instance.Zoom );
+				stream.SendNext( realRotation );
+				stream.SendNext( realZoom );
 			}
 			else
 			{
 				// Basic Info
 				stream.SendNext( BoatMover.Instance.transform.position );
-				stream.SendNext( KalerolsTower.Instance.CurrentFloorHeight );
+				stream.SendNext( KalerolsTower.CurrentFloorHeight );
 				stream.SendNext( GyroSpeedSlider.GyroModifier );
+				Camera cam = Compass.Instance.Camera;
+				stream.SendNext( cam.transform.parent.rotation.y );
 			}
 		}
 		else
@@ -65,8 +73,9 @@ public class SpyglassSync : MonoBehaviourPun, IPunObservable
 			else
 			{
 				realPosition = (Vector3) stream.ReceiveNext();
-				KalerolsTower.Instance.CurrentFloorHeight = (float) stream.ReceiveNext();
+				KalerolsTower.CurrentFloorHeight = (float) stream.ReceiveNext();
 				GyroSpeedSlider.GyroModifier = (float) stream.ReceiveNext();
+				CompassWatch.Rotation = (float) stream.ReceiveNext();
 			}
 		}
 	}

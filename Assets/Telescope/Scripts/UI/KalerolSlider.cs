@@ -20,6 +20,6 @@ public class KalerolSlider : MonoBehaviour
 
     public void SliderValueChanged( float value )
 	{
-        KalerolsTower.Instance.CurrentFloorHeight = value;
+        KalerolsTower.CurrentFloorHeight = value;
 	}
 }
